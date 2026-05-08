@@ -87,6 +87,31 @@ load_libraries() {
 }
 
 # =========================================================
+# Mostrar plugins
+# =========================================================
+
+list_plugins() {
+
+    printf "\n%-15s %-10s\n" "PLUGIN" "ENABLED"
+
+    for plugin in "$PLUGINS_DIR"/*.sh; do
+
+        unset name
+        unset description
+
+        source "$plugin"
+
+        local var="INSTALL_${name^^}"
+
+        printf "%-15s %-10s\n" \
+            "$name" \
+            "${!var:-false}"
+    done
+
+    echo
+}
+
+# =========================================================
 # Ejecutar plugins
 # =========================================================
 
@@ -123,23 +148,66 @@ run_plugins() {
 }
 
 # =========================================================
+# Mostrar ayuda
+# =========================================================
+
+usage() {
+
+    cat <<EOF
+
+Uso:
+
+./setup.sh --profile vps
+./setup.sh --list --profile vps
+
+EOF
+}
+
+# =========================================================
 # Main
 # =========================================================
 
 main() {
 
-    if [[ "${1:-}" != "--profile" ]]; then
-
-        echo "Uso: ./setup.sh --profile vps"
-
+    if [[ $# -eq 0 ]]; then
+        usage
         exit 1
     fi
 
+    local profile="vps"
+    local list_mode="false"
+
+    while [[ $# -gt 0 ]]; do
+
+        case "$1" in
+
+            --profile)
+                profile="$2"
+                shift 2
+                ;;
+
+            --list)
+                list_mode="true"
+                shift
+                ;;
+
+            *)
+                usage
+                exit 1
+                ;;
+        esac
+    done
+
     install_core_dependencies
 
-    load_profile "${2:-vps}"
+    load_profile "$profile"
 
     load_libraries
+
+    if [[ "$list_mode" == "true" ]]; then
+        list_plugins
+        exit 0
+    fi
 
     run_plugins
 
