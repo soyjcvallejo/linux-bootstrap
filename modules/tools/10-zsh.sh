@@ -5,8 +5,13 @@
 # =========================================================
 
 name="zsh"
-
 description="ZSH + Oh My Zsh + Powerlevel10k"
+
+# =========================================================
+# Importar librería común
+# =========================================================
+
+source "$(dirname "$0")/../../lib/common.sh"
 
 # =========================================================
 # Verificar instalación
@@ -15,8 +20,7 @@ description="ZSH + Oh My Zsh + Powerlevel10k"
 check() {
 
     command_exists zsh &&
-    [[ -d "${HOME}/.oh-my-zsh" ]] &&
-    [[ -d "${HOME}/.oh-my-zsh/custom/themes/powerlevel10k" ]]
+    [[ -d "${HOME}/.oh-my-zsh" ]]
 }
 
 # =========================================================
@@ -28,42 +32,58 @@ install() {
     echo "[INFO] Instalando zsh"
 
     # -----------------------------------------------------
-    # Dependencias
+    # Dependencias base
     # -----------------------------------------------------
 
-    install_apt_packages \
-        zsh \
-        git \
-        curl
+    install_apt_packages zsh git curl
 
     # -----------------------------------------------------
-    # Instalar Oh My Zsh
+    # Oh My Zsh (idempotente básico)
     # -----------------------------------------------------
 
-    RUNZSH=no CHSH=no sh -c \
-        "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+    if [[ ! -d "${HOME}/.oh-my-zsh" ]]; then
+
+        RUNZSH=no CHSH=no sh -c \
+            "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+
+    else
+        echo "[INFO] Oh My Zsh ya instalado"
+    fi
 
     # -----------------------------------------------------
-    # Instalar Powerlevel10k
+    # Powerlevel10k
     # -----------------------------------------------------
 
-    git clone --depth=1 \
-        https://github.com/romkatv/powerlevel10k.git \
-        "${HOME}/.oh-my-zsh/custom/themes/powerlevel10k"
+    local p10k_dir="${HOME}/.oh-my-zsh/custom/themes/powerlevel10k"
+
+    if [[ ! -d "$p10k_dir" ]]; then
+
+        git clone --depth=1 \
+            https://github.com/romkatv/powerlevel10k.git \
+            "$p10k_dir"
+
+    else
+        echo "[INFO] Powerlevel10k ya instalado"
+    fi
 
     # -----------------------------------------------------
-    # Copiar dotfiles
+    # Dotfiles (con backup)
     # -----------------------------------------------------
+
+    if [[ -f "${HOME}/.zshrc" ]]; then
+        cp "${HOME}/.zshrc" "${HOME}/.zshrc.backup.$(date +%s)"
+    fi
 
     cp configs/dotfiles/.zshrc "${HOME}/.zshrc"
-
     cp configs/dotfiles/.p10k.zsh "${HOME}/.p10k.zsh"
 
     # -----------------------------------------------------
-    # Cambiar shell por defecto
+    # Cambiar shell (solo si existe zsh)
     # -----------------------------------------------------
 
-    chsh -s "$(which zsh)"
+    if command_exists zsh; then
+        chsh -s "$(which zsh)" || true
+    fi
 
     echo "[INFO] zsh instalado correctamente"
 }
