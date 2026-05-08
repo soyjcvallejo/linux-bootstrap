@@ -14,6 +14,40 @@ command_exists() {
 }
 
 # ---------------------------------------------------------
+# Verificar si un paquete está instalado
+# ---------------------------------------------------------
+
+package_installed() {
+    dpkg -s "$1" >/dev/null 2>&1
+}
+
+# ---------------------------------------------------------
+# Instalar paquetes apt
+# ---------------------------------------------------------
+
+install_apt_packages() {
+
+    local missing=()
+
+    for package in "$@"; do
+
+        if ! package_installed "$package"; then
+            missing+=("$package")
+        fi
+    done
+
+    if [[ "${#missing[@]}" -eq 0 ]]; then
+        return
+    fi
+
+    echo "[INFO] Instalando paquetes: ${missing[*]}"
+
+    sudo apt-get update
+
+    sudo apt-get install -y "${missing[@]}"
+}
+
+# ---------------------------------------------------------
 # Instalar paquete .deb desde URL
 # ---------------------------------------------------------
 
