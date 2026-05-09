@@ -101,7 +101,9 @@ list_plugins() {
 
         source "$plugin"
 
-        local var="INSTALL_${name^^}"
+	local normalized_name="${name^^}"
+	normalized_name="${normalized_name//-/_}"
+	local var="INSTALL_${normalized_name}"
 
         printf "%-15s %-10s\n" \
             "$name" \
@@ -129,7 +131,9 @@ run_plugins() {
             continue
         fi
 
-        local var="INSTALL_${name^^}"
+	local normalized_name="${name^^}"
+	normalized_name="${normalized_name//-/_}"
+	local var="INSTALL_${normalized_name}"
 
         if [[ "${!var:-false}" != "true" ]]; then
             log "Plugin deshabilitado: $name"
