@@ -80,12 +80,13 @@ ZSH_THEME="powerlevel10k/powerlevel10k"
 plugins=(
  git
  sudo
+ zsh-vi-mode
 )
 
-source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-
 source $ZSH/oh-my-zsh.sh
+source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
 
 # User configuration
 
@@ -146,4 +147,4 @@ function fzf-lovely(){
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 
-
+#bindkey -v
