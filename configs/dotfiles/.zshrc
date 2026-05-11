@@ -155,4 +155,9 @@ function fzf-lovely(){
 	fi
 }
 
+# Created by `pipx` on 2023-10-16 02:38:59
+export PATH="$PATH:$HOME/.local/bin"
+
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+
+
