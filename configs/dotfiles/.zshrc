@@ -96,11 +96,21 @@ source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 #export LANG=en_US.UTF-8
 
 # Preferred editor for local and remote sessions
-# if [[ -n $SSH_CONNECTION ]]; then
-#   export EDITOR='vim'
-# else
-#   export EDITOR='mvim'
-# fi
+ if [[ -n $SSH_CONNECTION ]]; then
+   export EDITOR='vim'
+ else
+   export EDITOR='nvim'
+ fi
+
+
+function zvm_after_init() {
+  # 1. Recuperar FZF (Historial)
+  zvm_bindkey viins '^R' fzf-history-widget
+  # 2. SUDO con Alt + s (La '\e' representa el modificador Alt/Meta)
+  zvm_bindkey viins '\es' sudo-command-line
+  zvm_bindkey vicmd '\es' sudo-command-line  
+}
+
 
 # Compilation flags
 # export ARCHFLAGS="-arch x86_64"
@@ -146,5 +156,3 @@ function fzf-lovely(){
 }
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
-
-#bindkey -v
